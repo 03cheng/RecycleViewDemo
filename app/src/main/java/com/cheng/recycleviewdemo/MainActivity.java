@@ -187,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
                             Bundle bundle = new Bundle();
                             bundle.putParcelableArrayList("Meizis", (ArrayList<Meizi>) meizis);
                             bundle.putInt("position", position);
-                            bundle.putInt("page", page);
                             intent.putExtras(bundle);
                             startActivity(intent);
                         }

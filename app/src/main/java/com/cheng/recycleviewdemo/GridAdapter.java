@@ -68,7 +68,6 @@ public class GridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         //将数据与item视图进行绑定，如果是MyViewHolder就加载网络图片，如果是MyViewHolder2就显示页数
         if (holder instanceof MyViewHolder) {
-            //Picasso.with(context).load(datas.get(position).getUrl()).into(((MyViewHolder) holder).imageButton);
             Glide.with(context).load(datas.get(position).getUrl()).into(((MyViewHolder) holder).imageButton);
         } else if(holder instanceof MyViewHolder2){
             ((MyViewHolder2) holder).textView.setText(datas.get(position).getPage() + "页");
@@ -112,14 +111,4 @@ public class GridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             textView = (TextView) view.findViewById(R.id.textView);
         }
     }
-
-/*    public void addItem(Meizi meizi, int position){
-        datas.add(position, meizi);
-        notifyItemInserted(position);
-        recyclerview.scrollToPosition(position);
-    }
-    public void deleteItem(final int position){
-        datas.remove(position);
-        notifyItemRemoved(position);
-    }*/
 }

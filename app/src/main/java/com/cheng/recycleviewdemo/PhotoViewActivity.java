@@ -26,10 +26,10 @@ public class PhotoViewActivity extends AppCompatActivity {
         if (intent != null) {
             Bundle bundle = intent.getExtras();
             int position = bundle.getInt("position", 0);
-            int page = bundle.getInt("page", 0);
             List<Meizi> meizis = intent.getParcelableArrayListExtra("Meizis");
-            for(int i = 0; i < meizis.size(); i++){
-                if(TextUtils.isEmpty(meizis.get(i).getUrl())){
+            int page = position / 10;
+            for (int i = 0; i < meizis.size(); i++) {
+                if (TextUtils.isEmpty(meizis.get(i).getUrl())) {
                     meizis.remove(i);
                 }
             }
@@ -41,7 +41,7 @@ public class PhotoViewActivity extends AppCompatActivity {
                     finish();
                 }
             });
-            mViewPager.setCurrentItem(position - page + 1);
+            mViewPager.setCurrentItem(position - page);
         }
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
