@@ -27,7 +27,7 @@ public class PhotoViewActivity extends AppCompatActivity {
             Bundle bundle = intent.getExtras();
             int position = bundle.getInt("position", 0);
             List<Meizi> meizis = intent.getParcelableArrayListExtra("Meizis");
-            int page = position / 10;
+            int page = position / 11;
             for (int i = 0; i < meizis.size(); i++) {
                 if (TextUtils.isEmpty(meizis.get(i).getUrl())) {
                     meizis.remove(i);
