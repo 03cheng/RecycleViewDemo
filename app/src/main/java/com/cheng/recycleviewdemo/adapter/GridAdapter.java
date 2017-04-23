@@ -1,4 +1,4 @@
-package com.cheng.recycleviewdemo;
+package com.cheng.recycleviewdemo.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +10,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.cheng.recycleviewdemo.data.Meizi;
+import com.cheng.recycleviewdemo.R;
 
 import java.util.List;
 
@@ -68,7 +71,7 @@ public class GridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         //将数据与item视图进行绑定，如果是MyViewHolder就加载网络图片，如果是MyViewHolder2就显示页数
         if (holder instanceof MyViewHolder) {
-            Glide.with(context).load(datas.get(position).getUrl()).into(((MyViewHolder) holder).imageButton);
+            Glide.with(context).load(datas.get(position).getUrl()).diskCacheStrategy(DiskCacheStrategy.ALL).into(((MyViewHolder) holder).imageButton);
         } else if(holder instanceof MyViewHolder2){
             ((MyViewHolder2) holder).textView.setText(datas.get(position).getPage() + "页");
         }

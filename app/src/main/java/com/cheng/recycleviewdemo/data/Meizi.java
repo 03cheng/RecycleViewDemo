@@ -1,4 +1,4 @@
-package com.cheng.recycleviewdemo;
+package com.cheng.recycleviewdemo.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

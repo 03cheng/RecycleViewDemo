@@ -1,4 +1,4 @@
-package com.cheng.recycleviewdemo;
+package com.cheng.recycleviewdemo.util;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

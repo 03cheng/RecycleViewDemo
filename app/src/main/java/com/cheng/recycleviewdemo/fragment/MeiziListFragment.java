@@ -1,22 +1,28 @@
-package com.cheng.recycleviewdemo;
+package com.cheng.recycleviewdemo.fragment;
 
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
 
+import com.cheng.recycleviewdemo.adapter.GridAdapter;
+import com.cheng.recycleviewdemo.data.Meizi;
+import com.cheng.recycleviewdemo.util.MyOkhttp;
+import com.cheng.recycleviewdemo.activity.PhotoViewActivity;
+import com.cheng.recycleviewdemo.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -26,8 +32,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * Created by asus on 2017-04-22.
+ */
 
+public class MeiziListFragment extends Fragment {
+    private View mContainView;
     private RecyclerView recyclerView;
     private CoordinatorLayout coordinatorLayout;
     private GridAdapter mAdapter;
@@ -39,25 +49,27 @@ public class MainActivity extends AppCompatActivity {
     private ItemTouchHelper itemTouchHelper;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mContainView = inflater.inflate(R.layout.fragment_meizilist, container, false);
 
         initView();
         setListener();
         new GetData().execute("http://gank.io/api/data/福利/10/1");
+        return mContainView;
     }
 
-
     private void initView() {
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mLayoutManager = new GridLayoutManager(MainActivity.this, 2, GridLayout.VERTICAL, false);
+        coordinatorLayout = (CoordinatorLayout) mContainView.findViewById(R.id.coordinatorLayout);
+        recyclerView = (RecyclerView) mContainView.findViewById(R.id.recyclerView);
+        mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayout.VERTICAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout = (SwipeRefreshLayout) mContainView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setProgressViewOffset(false, 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         Resources resources = getResources();
@@ -176,14 +188,14 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (mAdapter == null) {
-                    recyclerView.setAdapter(mAdapter = new GridAdapter(MainActivity.this, meizis));//recyclerview设置适配器
+                    recyclerView.setAdapter(mAdapter = new GridAdapter(getActivity(), meizis));//recyclerview设置适配器
 
                     //实现适配器自定义的点击监听
                     mAdapter.setOnItemClickListener(new GridAdapter.OnRecyclerViewItemClickListener() {
                         @Override
                         public void onItemClick(View view) {
                             int position = recyclerView.getChildAdapterPosition(view);
-                            Intent intent = new Intent(MainActivity.this, PhotoViewActivity.class);
+                            Intent intent = new Intent(getActivity(), PhotoViewActivity.class);
                             Bundle bundle = new Bundle();
                             bundle.putParcelableArrayList("Meizis", (ArrayList<Meizi>) meizis);
                             bundle.putInt("position", position);

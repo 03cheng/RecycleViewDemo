@@ -1,4 +1,4 @@
-package com.cheng.recycleviewdemo;
+package com.cheng.recycleviewdemo.adapter;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 
 import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.cheng.recycleviewdemo.data.Meizi;
 
 import java.util.List;
 
@@ -44,7 +46,7 @@ public class MyPageAdapter extends PagerAdapter implements View.OnClickListener 
     @Override
     public Object instantiateItem(final ViewGroup container, int position) {
         final PhotoView photoView = new PhotoView(container.getContext());
-        Glide.with(container.getContext()).load(meizis.get(position).getUrl()).into(photoView);
+        Glide.with(container.getContext()).load(meizis.get(position).getUrl()).diskCacheStrategy(DiskCacheStrategy.ALL).into(photoView);
         photoView.enable();
         photoView.setOnClickListener(this);
         photoView.setAdjustViewBounds(true);
