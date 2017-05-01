@@ -18,7 +18,7 @@ import com.cheng.recycleviewdemo.R;
  */
 
 public class BlogFragment extends Fragment {
-    private static final String BLOG = "http://03cheng.github.io";
+    private static final String BLOG = "https://03cheng.github.io";
     private View mContainView;
     private ProgressBar mProgressBar;
     private WebView mWebView;
@@ -31,12 +31,14 @@ public class BlogFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContainView = inflater.inflate(R.layout.fragment_blog, container, false);
+
         mWebView = (WebView) mContainView.findViewById(R.id.web_view);
-        mProgressBar = (ProgressBar)mContainView.findViewById(R.id.progress_bar);
+        mProgressBar = (ProgressBar) mContainView.findViewById(R.id.progress_bar);
         initWebView();
         mWebView.loadUrl(BLOG);
         return mContainView;
     }
+
     private void initWebView() {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override

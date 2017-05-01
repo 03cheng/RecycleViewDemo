@@ -14,9 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
@@ -36,13 +34,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout mDrawerLayout;
-    private CoordinatorLayout rootLayout;
-    private NavigationView mNavigationView;
     private boolean backPressed;
     private int mCurrentUIIndex = 0;
     private static final int INDEX_HOME = 0;
-    private static final int INDEX_BLOG = 1;
-    private static final int INDEX_COLLECTION = 2;
+    private static final int INDEX_COLLECTION = 1;
+    private static final int INDEX_BLOG = 2;
     Fragment mHomeFragment;
     Fragment mBlogFragment;
     Fragment mCurrentFragment;
@@ -51,20 +47,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(MainActivity.this,
-                mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);//自动为toolbar添加图标
-        mDrawerLayout.setDrawerListener(drawerToggle);
-        drawerToggle.syncState();//实现箭头和三条杠图案切换和抽屉拉合的同步
 
-        rootLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
-        final View mHeadViewContainer = mNavigationView.getHeaderView(0);
+        final View mHeadViewContainer = mNavigationView.getHeaderView(0);//获取侧滑栏的头部
         final CircleImageView mheaderimage = (CircleImageView) mHeadViewContainer.findViewById(R.id.headerImage);
         Glide.with(this)
                 .load("http://03cheng.github.io/images/avatar.jpg")
@@ -96,20 +84,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
-        getSupportActionBar().show();
         switch (mCurrentUIIndex) {
             case INDEX_HOME:
                 if (mHomeFragment == null) {
                     mHomeFragment = new MeiziListFragment();
                 }
-                getSupportActionBar().setTitle("妹子");
                 switchFragment(mHomeFragment);
                 break;
             case INDEX_BLOG:
                 if (mBlogFragment == null) {
                     mBlogFragment = new BlogFragment();
                 }
-                getSupportActionBar().hide();
                 switchFragment(mBlogFragment);
                 break;
             case INDEX_COLLECTION:
@@ -126,11 +111,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_home:
                 mCurrentUIIndex = INDEX_HOME;
                 break;
-            case R.id.nav_blog:
-                mCurrentUIIndex = INDEX_BLOG;
-                break;
             case R.id.nav_collect:
                 mCurrentUIIndex = INDEX_COLLECTION;
+                break;
+            case R.id.nav_blog:
+                mCurrentUIIndex = INDEX_BLOG;
                 break;
             default:
                 break;
@@ -139,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
+    /**
+     * 切换Fragment
+     */
     private void switchFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction;
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -160,11 +148,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Override
     public void onBackPressed() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
-        } else if (fragment == mBlogFragment) {
-            WebView webView = (WebView) fragment.getView().findViewById(R.id.web_view);
+        } else if (mCurrentFragment == mBlogFragment) {
+            WebView webView = (WebView) mCurrentFragment.getView().findViewById(R.id.web_view);
             if (webView.canGoBack()) {
                 webView.goBack();
             } else {
@@ -183,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
         backPressed = true;
+        CoordinatorLayout rootLayout = (CoordinatorLayout) mCurrentFragment.getView().findViewById(R.id.coordinatorLayout);
         Snackbar.make(rootLayout, "确定要离开？", Snackbar.LENGTH_SHORT).show();
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -191,4 +179,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }, 2000);
     }
+
 }

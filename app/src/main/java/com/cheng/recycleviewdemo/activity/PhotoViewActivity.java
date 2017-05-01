@@ -26,6 +26,8 @@ import com.cheng.recycleviewdemo.view.MyViewPager;
 
 import java.util.List;
 
+import static com.cheng.recycleviewdemo.util.ConstUtil.POSITION;
+
 public class PhotoViewActivity extends AppCompatActivity implements View.OnClickListener {
     private CoordinatorLayout rootLayout;
     private MyViewPager mViewPager;
@@ -51,7 +53,7 @@ public class PhotoViewActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photoview);
 
-        rootLayout = (CoordinatorLayout)findViewById(R.id.root_layout);
+        rootLayout = (CoordinatorLayout) findViewById(R.id.root_layout);
         mViewPager = (MyViewPager) findViewById(R.id.view_pager);
         collect = (ImageButton) findViewById(R.id.btn_collect);
         collect.setOnClickListener(this);
@@ -61,7 +63,7 @@ public class PhotoViewActivity extends AppCompatActivity implements View.OnClick
         Intent intent = getIntent();
         if (intent != null) {
             Bundle bundle = intent.getExtras();
-            int position = bundle.getInt("position", 0);
+            int position = bundle.getInt(POSITION, 0);
             meizis = intent.getParcelableArrayListExtra("Meizis");
             int page = position / 11;
             for (int i = 0; i < meizis.size(); i++) {
@@ -74,7 +76,11 @@ public class PhotoViewActivity extends AppCompatActivity implements View.OnClick
             adapter.setOnPhotoViewItemClickListener(new MyPageAdapter.OnPhotoViewItemClickListener() {
                 @Override
                 public void onItemClick(View view) {
+                    Intent i = new Intent();
+                    i.putExtra("position", mViewPager.getCurrentItem() / 10 + mViewPager.getCurrentItem());
+                    setResult(RESULT_OK, i);
                     finish();
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 }
             });
             mViewPager.setCurrentItem(position - page);
@@ -90,10 +96,10 @@ public class PhotoViewActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        if(downloadBinder == null){
+        if (downloadBinder == null) {
             return;
         }
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_collect:
                 Snackbar.make(rootLayout, "收藏成功" + mViewPager.getCurrentItem(), Snackbar.LENGTH_SHORT).setAction("撤销", new View.OnClickListener() {
                     @Override
@@ -107,7 +113,7 @@ public class PhotoViewActivity extends AppCompatActivity implements View.OnClick
                         permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(PhotoViewActivity.this,
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                }else {
+                } else {
                     String url = meizis.get(mViewPager.getCurrentItem()).getUrl();
                     downloadBinder.startDownload(url);
                     Snackbar.make(rootLayout, "图片已保存至" + mViewPager.getCurrentItem(), Snackbar.LENGTH_SHORT).show();
@@ -120,11 +126,11 @@ public class PhotoViewActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case 1:
-                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     Snackbar.make(rootLayout, "无法获取存储权限", Snackbar.LENGTH_SHORT).show();
-                }else{
+                } else {
                     String url = meizis.get(mViewPager.getCurrentItem()).getUrl();
                     downloadBinder.startDownload(url);
                     Snackbar.make(rootLayout, "图片已保存至" + mViewPager.getCurrentItem(), Snackbar.LENGTH_SHORT).show();

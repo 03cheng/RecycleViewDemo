@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -18,11 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 
+import com.cheng.recycleviewdemo.R;
+import com.cheng.recycleviewdemo.activity.PhotoViewActivity;
 import com.cheng.recycleviewdemo.adapter.GridAdapter;
 import com.cheng.recycleviewdemo.data.Meizi;
 import com.cheng.recycleviewdemo.util.MyOkhttp;
-import com.cheng.recycleviewdemo.activity.PhotoViewActivity;
-import com.cheng.recycleviewdemo.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -32,6 +35,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.app.Activity.RESULT_OK;
+import static com.cheng.recycleviewdemo.util.ConstUtil.MEIZI_BASE_URL;
+import static com.cheng.recycleviewdemo.util.ConstUtil.POSITION;
+
 /**
  * Created by asus on 2017-04-22.
  */
@@ -39,7 +46,6 @@ import java.util.List;
 public class MeiziListFragment extends Fragment {
     private View mContainView;
     private RecyclerView recyclerView;
-    private CoordinatorLayout coordinatorLayout;
     private GridAdapter mAdapter;
     private List<Meizi> meizis;
     private GridLayoutManager mLayoutManager;
@@ -49,22 +55,24 @@ public class MeiziListFragment extends Fragment {
     private ItemTouchHelper itemTouchHelper;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContainView = inflater.inflate(R.layout.fragment_meizilist, container, false);
-
         initView();
         setListener();
-        new GetData().execute("http://gank.io/api/data/福利/10/1");
+        new GetData().execute(MEIZI_BASE_URL + page);
         return mContainView;
     }
 
     private void initView() {
-        coordinatorLayout = (CoordinatorLayout) mContainView.findViewById(R.id.coordinatorLayout);
+        Toolbar toolbar = (Toolbar) mContainView.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        DrawerLayout mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(getActivity(),
+                mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);//自动为toolbar添加图标
+        mDrawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();//实现箭头和三条杠图案切换和抽屉拉合的同步
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("妹子");
+
         recyclerView = (RecyclerView) mContainView.findViewById(R.id.recyclerView);
         mLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayout.VERTICAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -73,10 +81,11 @@ public class MeiziListFragment extends Fragment {
         swipeRefreshLayout.setProgressViewOffset(false, 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         Resources resources = getResources();
-        swipeRefreshLayout.setColorSchemeColors(resources.getColor(R.color.blue_dark),
+        int[] SCHEME_COLORS = {resources.getColor(R.color.blue_dark),
                 resources.getColor(R.color.red_dark),
                 resources.getColor(R.color.yellow_dark),
-                resources.getColor(R.color.green_dark));
+                resources.getColor(R.color.green_dark)};
+        swipeRefreshLayout.setColorSchemeColors(SCHEME_COLORS);
     }
 
     private void setListener() {
@@ -86,7 +95,7 @@ public class MeiziListFragment extends Fragment {
                 meizis = null;
                 mAdapter = null;
                 page = 1;
-                new GetData().execute("http://gank.io/api/data/福利/10/1");
+                new GetData().execute(MEIZI_BASE_URL + page);
             }
         });
 
@@ -97,7 +106,7 @@ public class MeiziListFragment extends Fragment {
                 //0：当前屏幕停止滚动；1时：屏幕在滚动 且 用户仍在触碰或手指还在屏幕上；2时：随用户的操作，屏幕上产生的惯性滑动；
                 // 滑动状态停止并且剩余少于两个item时，自动加载下一页
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 2 >= mLayoutManager.getItemCount()) {
-                    new GetData().execute("http://gank.io/api/data/福利/10/" + (++page));
+                    new GetData().execute(MEIZI_BASE_URL + (++page));
                 }
             }
 
@@ -140,6 +149,21 @@ public class MeiziListFragment extends Fragment {
                 return false;
             }
         });
+    }
+
+    /**
+     * 根据查看大图的position滚动RecycleView至指定位置
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (resultCode) {
+            case RESULT_OK:
+                if (requestCode == 100) {
+                    int position = data.getIntExtra(POSITION, 0);
+                    recyclerView.scrollToPosition(position + 2);
+                }
+                break;
+        }
     }
 
     private class GetData extends AsyncTask<String, Integer, String> {
@@ -198,9 +222,10 @@ public class MeiziListFragment extends Fragment {
                             Intent intent = new Intent(getActivity(), PhotoViewActivity.class);
                             Bundle bundle = new Bundle();
                             bundle.putParcelableArrayList("Meizis", (ArrayList<Meizi>) meizis);
-                            bundle.putInt("position", position);
+                            bundle.putInt(POSITION, position);
                             intent.putExtras(bundle);
-                            startActivity(intent);
+                            startActivityForResult(intent, 100);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
 
                         @Override
